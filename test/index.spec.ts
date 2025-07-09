@@ -6,19 +6,64 @@ import worker from '../src/index';
 // `Request` to pass to `worker.fetch()`.
 const IncomingRequest = Request<unknown, IncomingRequestCfProperties>;
 
-describe('Hello World worker', () => {
-	it('responds with Hello World! (unit style)', async () => {
-		const request = new IncomingRequest('http://example.com');
-		// Create an empty context to pass to `worker.fetch()`.
-		const ctx = createExecutionContext();
-		const response = await worker.fetch(request, env, ctx);
-		// Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
-		await waitOnExecutionContext(ctx);
-		expect(await response.text()).toMatchInlineSnapshot(`"Hello World!"`);
+describe('STT Demo Proxy worker', () => {
+	it('responds with configuration status on GET request', async () => {
+		const request = new IncomingRequest('http://example.com', { method: 'GET' });
+		const response = await worker.fetch(request, env);
+
+		// Should return 500 if STT configuration is missing (which it will be in test env)
+		expect(response.status).toBe(500);
+		expect(await response.text()).toBe('STT configuration is missing');
 	});
 
-	it('responds with Hello World! (integration style)', async () => {
-		const response = await SELF.fetch('https://example.com');
-		expect(await response.text()).toMatchInlineSnapshot(`"Hello World!"`);
+	it('handles CORS preflight requests', async () => {
+		const request = new IncomingRequest('http://example.com', {
+			method: 'OPTIONS',
+			headers: {
+				Origin: 'https://netgeist.ai',
+			},
+		});
+		const response = await worker.fetch(request, env);
+
+		expect(response.status).toBe(200);
+		expect(response.headers.get('Access-Control-Allow-Origin')).toBe('https://netgeist.ai');
+		expect(response.headers.get('Access-Control-Allow-Methods')).toBe('POST, OPTIONS');
+	});
+
+	it('rejects unauthorized origins', async () => {
+		const request = new IncomingRequest('http://example.com', {
+			method: 'POST',
+			headers: {
+				Origin: 'https://unauthorized-site.com',
+			},
+		});
+		const response = await worker.fetch(request, env);
+
+		expect(response.status).toBe(403);
+		expect(await response.text()).toBe('Unauthorized origin');
+	});
+
+	it('rejects requests without audio file', async () => {
+		const formData = new FormData();
+		const request = new IncomingRequest('http://example.com', {
+			method: 'POST',
+			headers: {
+				Origin: 'https://netgeist.ai',
+			},
+			body: formData,
+		});
+		const response = await worker.fetch(request, env);
+
+		expect(response.status).toBe(400);
+		const result = (await response.json()) as { message: string };
+		expect(result.message).toBe('No audio file uploaded');
+	});
+
+	it('rejects unsupported HTTP methods', async () => {
+		const request = new IncomingRequest('http://example.com', { method: 'PUT' });
+		const response = await worker.fetch(request, env);
+
+		expect(response.status).toBe(405);
+		expect(await response.text()).toBe('Method not allowed');
 	});
 });
