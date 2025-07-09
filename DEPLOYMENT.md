@@ -39,9 +39,6 @@ This project uses GitHub Actions to automatically deploy to Cloudflare Workers f
    - **Name**: `CLOUDFLARE_API_TOKEN`
      **Value**: Your Cloudflare API token from step 1
 
-   - **Name**: `STT_TOKEN`
-     **Value**: Your STT token value
-
 #### Variables (for non-sensitive data):
 
 4. Click **Variables** tab, then **New repository variable** and add:

@@ -5,6 +5,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
+	"account_id": "52fdb8962dbc551e61d2f7d63870596b",
 	"name": "stt-demo-proxy",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-05-15",

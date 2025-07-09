@@ -54,14 +54,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Set STT Token Secret
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          command: secret put STT_TOKEN
-          secretValue: ${{ secrets.STT_TOKEN }}
-
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
