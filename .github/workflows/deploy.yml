@@ -55,11 +55,12 @@ jobs:
         run: pnpm install
 
       - name: Set STT Token Secret
-        run: |
-          echo "${{ secrets.STT_TOKEN }}" | wrangler secret put STT_TOKEN --name stt-demo-proxy
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          command: secret put STT_TOKEN
+          secretValue: ${{ secrets.STT_TOKEN }}
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
