@@ -10,6 +10,7 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 
 export default {
 	async fetch(request, env: Env): Promise<Response> {
@@ -74,7 +75,8 @@ export default {
 		}
 
 		const formData = await request.formData();
-		const audioFile = formData.get('file') as Blob;
+
+		let audioFile = formData.get('file') as Blob | string;
 
 		if (!audioFile) {
 			return Response.json(
@@ -88,8 +90,54 @@ export default {
 			);
 		}
 
+		if (typeof audioFile === 'string') {
+			// audioFile is a URL, fetch the audio from it
+			try {
+				const audioResponse = await fetch(audioFile);
+
+				if (!audioResponse.ok) {
+					return Response.json(
+						{ message: 'Failed to fetch audio from URL' },
+						{
+							status: 400,
+							headers: {
+								'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'https://netgeist.ai',
+							},
+						}
+					);
+				}
+
+				const audioBlob = await audioResponse.blob();
+
+				// Check file size (limit to 10MB)
+				if (audioBlob.size > MAX_FILE_SIZE) {
+					return Response.json(
+						{ message: 'Audio file size exceeds 10MB limit' },
+						{
+							status: 400,
+							headers: {
+								'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'https://netgeist.ai',
+							},
+						}
+					);
+				}
+
+				// Use the fetched audio blob for processing
+				audioFile = audioBlob;
+			} catch (error) {
+				return Response.json(
+					{ message: 'Error fetching audio from URL' },
+					{
+						status: 400,
+						headers: {
+							'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'https://netgeist.ai',
+						},
+					}
+				);
+			}
+		}
+
 		// Check file size (limit to 10MB)
-		const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
 		if (audioFile.size > MAX_FILE_SIZE) {
 			return Response.json(
 				{ message: 'File size exceeds 10MB limit' },
