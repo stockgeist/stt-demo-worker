@@ -18,6 +18,8 @@ export default {
 
 		// Define allowed origins
 		const allowedOrigins = [
+			// Remove this after testing
+			'http://localhost:3000',
 			'http://172.16.2.11:3000',
 			'https://netgeist.ai',
 			'https://www.netgeist.ai',
