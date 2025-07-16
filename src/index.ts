@@ -224,7 +224,8 @@ export default {
 					},
 				}
 			);
-		} catch {
+		} catch (error) {
+			console.log('Error processing audio file', JSON.stringify(error));
 			return Response.json(
 				{ message: 'Error processing audio file' },
 				{
