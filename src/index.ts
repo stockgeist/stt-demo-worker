@@ -169,7 +169,17 @@ export default {
 		const form = new FormData();
 		form.append('file', audioFile, 'audio.wav');
 		form.append('response_format', 'text');
-		form.append('language', language || 'lt');
+		form.append('language', language || 'en');
+
+		console.log(
+			'FormData created with entries:',
+			Array.from(form.entries()).map(([key, value]) => ({
+				key,
+				type: typeof value,
+				isBlob: value instanceof Blob,
+				size: value instanceof Blob ? value.size : 'N/A',
+			}))
+		);
 
 		if (!env.STT_URL || !env.STT_TOKEN) {
 			console.log('STT configuration missing:', { hasUrl: !!env.STT_URL, hasToken: !!env.STT_TOKEN });
@@ -187,6 +197,23 @@ export default {
 		console.log('Making STT API call to:', env.STT_URL);
 
 		try {
+			// Log the request details
+			console.log(
+				'Request details:',
+				JSON.stringify({
+					url: env.STT_URL,
+					method: 'POST',
+					hasToken: !!env.STT_TOKEN,
+					formDataEntries: Array.from(form.entries()).map(([key, value]) => ({
+						key,
+						type: typeof value,
+						isBlob: value instanceof Blob,
+						size: value instanceof Blob ? value.size : 'N/A',
+					})),
+				})
+			);
+
+			// Make a minimal request with just the authorization header
 			const response = await fetch(env.STT_URL, {
 				method: 'POST',
 				headers: {
@@ -195,12 +222,14 @@ export default {
 				body: form,
 			});
 			if (!response.ok) {
+				const errorBody = await response.text();
 				console.log(
 					'STT API call failed:',
 					JSON.stringify({
 						status: response.status,
 						statusText: response.statusText,
-						body: await response.text(),
+						body: errorBody,
+						headers: Object.fromEntries(response.headers.entries()),
 					})
 				);
 				return Response.json(
