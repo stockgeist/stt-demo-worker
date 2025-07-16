@@ -68,6 +68,7 @@ export default {
 
 		// Reject requests from unauthorized origins
 		if (!isAllowedOrigin) {
+			console.log('Unauthorized origin', origin);
 			return new Response('Unauthorized origin', {
 				status: 403,
 				headers: {
