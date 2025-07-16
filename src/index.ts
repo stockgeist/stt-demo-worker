@@ -85,11 +85,14 @@ export default {
 		let audioFile = formData.get('file') as Blob | string;
 		const language = formData.get('language') as string;
 
-		console.log('Form data received:', {
-			hasAudioFile: !!audioFile,
-			audioFileType: typeof audioFile,
-			language: language,
-		});
+		console.log(
+			'Form data received:',
+			JSON.stringify({
+				hasAudioFile: !!audioFile,
+				audioFileType: typeof audioFile,
+				language: language,
+			})
+		);
 
 		if (!audioFile) {
 			return Response.json(
@@ -191,7 +194,7 @@ export default {
 				},
 				body: form,
 			});
-
+			console.log('STT API response:', JSON.stringify(response));
 			if (!response.ok) {
 				return Response.json(
 					{ message: response.statusText },
