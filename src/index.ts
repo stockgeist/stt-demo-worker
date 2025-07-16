@@ -78,10 +78,18 @@ export default {
 			});
 		}
 
+		console.log('Origin check passed, processing request...');
+
 		const formData = await request.formData();
 
 		let audioFile = formData.get('file') as Blob | string;
 		const language = formData.get('language') as string;
+
+		console.log('Form data received:', {
+			hasAudioFile: !!audioFile,
+			audioFileType: typeof audioFile,
+			language: language,
+		});
 
 		if (!audioFile) {
 			return Response.json(
@@ -161,6 +169,7 @@ export default {
 		form.append('language', language || 'lt');
 
 		if (!env.STT_URL || !env.STT_TOKEN) {
+			console.log('STT configuration missing:', { hasUrl: !!env.STT_URL, hasToken: !!env.STT_TOKEN });
 			return Response.json(
 				{ message: 'STT configuration is missing' },
 				{
@@ -171,6 +180,8 @@ export default {
 				}
 			);
 		}
+
+		console.log('Making STT API call to:', env.STT_URL);
 
 		try {
 			const response = await fetch(env.STT_URL, {
