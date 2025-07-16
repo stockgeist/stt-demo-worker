@@ -28,6 +28,7 @@ export default {
 
 		// Check if origin is allowed
 		const isAllowedOrigin = origin && allowedOrigins.some((allowed) => origin === allowed);
+		console.log('Origin check:', { origin, allowedOrigins, isAllowedOrigin });
 
 		// Handle CORS preflight requests
 		if (request.method === 'OPTIONS') {
@@ -157,7 +158,7 @@ export default {
 		const form = new FormData();
 		form.append('file', audioFile, 'audio.wav');
 		form.append('response_format', 'text');
-		form.append('language', language);
+		form.append('language', language || 'lt');
 
 		if (!env.STT_URL || !env.STT_TOKEN) {
 			return Response.json(
