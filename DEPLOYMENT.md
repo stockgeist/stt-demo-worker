@@ -82,7 +82,7 @@ For security, the `STT_TOKEN` is stored as a Cloudflare secret rather than in th
 wrangler secret put STT_TOKEN
 ```
 
-When prompted, enter your STT token value: `nt-stt-158796341514457`
+When prompted, enter your STT token value: ``
 
 ### Alternative: Set via GitHub Actions
 

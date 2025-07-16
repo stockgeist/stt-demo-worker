@@ -13,7 +13,7 @@
 		"enabled": true
 	},
 	"vars": {
-		"STT_URL": "http://s1.neurotechnology.com:48005/stt"
+		"STT_URL": "http://82.135.201.173:8000/stt"
 	}
 
 	/**

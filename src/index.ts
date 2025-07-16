@@ -79,6 +79,7 @@ export default {
 		const formData = await request.formData();
 
 		let audioFile = formData.get('file') as Blob | string;
+		const language = formData.get('language') as string;
 
 		if (!audioFile) {
 			return Response.json(
@@ -154,8 +155,8 @@ export default {
 
 		const form = new FormData();
 		form.append('file', audioFile, 'audio.wav');
-		form.append('response_format', 'json');
-		form.append('language', 'lithuanian');
+		form.append('response_format', 'text');
+		form.append('language', language);
 
 		if (!env.STT_URL || !env.STT_TOKEN) {
 			return Response.json(
@@ -190,13 +191,16 @@ export default {
 				);
 			}
 
-			const result = await response.json();
-			return Response.json(result, {
-				status: 200,
-				headers: {
-					'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'https://netgeist.ai',
-				},
-			});
+			const result = await response.text();
+			return Response.json(
+				{ text: result },
+				{
+					status: 200,
+					headers: {
+						'Access-Control-Allow-Origin': isAllowedOrigin ? origin : 'https://netgeist.ai',
+					},
+				}
+			);
 		} catch {
 			return Response.json(
 				{ message: 'Error processing audio file' },
