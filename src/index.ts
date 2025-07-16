@@ -194,8 +194,15 @@ export default {
 				},
 				body: form,
 			});
-			console.log('STT API response:', JSON.stringify(response));
 			if (!response.ok) {
+				console.log(
+					'STT API call failed:',
+					JSON.stringify({
+						status: response.status,
+						statusText: response.statusText,
+						body: await response.text(),
+					})
+				);
 				return Response.json(
 					{ message: response.statusText },
 					{
