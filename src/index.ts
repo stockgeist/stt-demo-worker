@@ -245,6 +245,7 @@ export default {
 			}
 
 			const result = await response.text();
+			console.log('STT API response:', result);
 			return Response.json(
 				{ text: result },
 				{
