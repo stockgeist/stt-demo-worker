@@ -221,6 +221,7 @@ export default {
 				},
 				body: form,
 			});
+
 			if (!response.ok) {
 				const errorBody = await response.text();
 				console.log(
