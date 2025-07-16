@@ -28,7 +28,7 @@ export default {
 
 		// Check if origin is allowed
 		const isAllowedOrigin = origin && allowedOrigins.some((allowed) => origin === allowed);
-		console.log('Origin check:', { origin, allowedOrigins, isAllowedOrigin });
+		console.log('Origin check:', JSON.stringify({ origin, allowedOrigins, isAllowedOrigin }));
 
 		// Handle CORS preflight requests
 		if (request.method === 'OPTIONS') {
