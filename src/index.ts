@@ -28,7 +28,6 @@ export default {
 
 		// Check if origin is allowed
 		const isAllowedOrigin = origin && allowedOrigins.some((allowed) => origin === allowed);
-		console.log('Origin check:', JSON.stringify({ origin, allowedOrigins, isAllowedOrigin }));
 
 		// Handle CORS preflight requests
 		if (request.method === 'OPTIONS') {
@@ -69,7 +68,6 @@ export default {
 
 		// Reject requests from unauthorized origins
 		if (!isAllowedOrigin) {
-			console.log('Unauthorized origin', origin);
 			return new Response('Unauthorized origin', {
 				status: 403,
 				headers: {
@@ -78,21 +76,10 @@ export default {
 			});
 		}
 
-		console.log('Origin check passed, processing request...');
-
 		const formData = await request.formData();
 
 		let audioFile = formData.get('file') as Blob | string;
 		const language = formData.get('language') as string;
-
-		console.log(
-			'Form data received:',
-			JSON.stringify({
-				hasAudioFile: !!audioFile,
-				audioFileType: typeof audioFile,
-				language: language,
-			})
-		);
 
 		if (!audioFile) {
 			return Response.json(
@@ -171,18 +158,7 @@ export default {
 		form.append('response_format', 'text');
 		form.append('language', language || 'en');
 
-		console.log(
-			'FormData created with entries:',
-			Array.from(form.entries()).map(([key, value]) => ({
-				key,
-				type: typeof value,
-				isBlob: value instanceof Blob,
-				size: value instanceof Blob ? value.size : 'N/A',
-			}))
-		);
-
 		if (!env.STT_URL || !env.STT_TOKEN) {
-			console.log('STT configuration missing:', { hasUrl: !!env.STT_URL, hasToken: !!env.STT_TOKEN });
 			return Response.json(
 				{ message: 'STT configuration is missing' },
 				{
@@ -194,26 +170,7 @@ export default {
 			);
 		}
 
-		console.log('Making STT API call to:', env.STT_URL, 'with token:', env.STT_TOKEN.substring(0, 5) + '...');
-
 		try {
-			// Log the request details
-			console.log(
-				'Request details:',
-				JSON.stringify({
-					url: env.STT_URL,
-					method: 'POST',
-					hasToken: !!env.STT_TOKEN,
-					formDataEntries: Array.from(form.entries()).map(([key, value]) => ({
-						key,
-						type: typeof value,
-						isBlob: value instanceof Blob,
-						size: value instanceof Blob ? value.size : 'N/A',
-					})),
-				})
-			);
-
-			// Make a minimal request with just the authorization header
 			const response = await fetch(env.STT_URL, {
 				method: 'POST',
 				headers: {
@@ -223,16 +180,6 @@ export default {
 			});
 
 			if (!response.ok) {
-				const errorBody = await response.text();
-				console.log(
-					'STT API call failed:',
-					JSON.stringify({
-						status: response.status,
-						statusText: response.statusText,
-						body: errorBody,
-						headers: Object.fromEntries(response.headers.entries()),
-					})
-				);
 				return Response.json(
 					{ message: response.statusText },
 					{
@@ -245,7 +192,6 @@ export default {
 			}
 
 			const result = await response.text();
-			console.log('STT API response:', result);
 			return Response.json(
 				{ text: result },
 				{
@@ -256,7 +202,6 @@ export default {
 				}
 			);
 		} catch (error) {
-			console.log('Error processing audio file', JSON.stringify(error));
 			return Response.json(
 				{
 					message: 'Error processing audio file',

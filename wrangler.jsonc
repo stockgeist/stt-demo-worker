@@ -13,8 +13,7 @@
 		"enabled": true
 	},
 	"vars": {
-		"STT_URL": "http://82.135.201.173:8000/stt",
-		"STT_TOKEN": "Neuvi-651@1518441381564&857"
+		"STT_URL": "http://nlp-api.netgeist.ai:8000/stt"
 	}
 
 	/**
