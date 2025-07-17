@@ -194,7 +194,7 @@ export default {
 			);
 		}
 
-		console.log('Making STT API call to:', env.STT_URL);
+		console.log('Making STT API call to:', env.STT_URL, 'with token:', env.STT_TOKEN.substring(0, 5) + '...');
 
 		try {
 			// Log the request details
