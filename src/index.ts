@@ -191,7 +191,7 @@ export default {
 				);
 			}
 
-			const result = await response.text();
+			const result = await response.json();
 			return Response.json(
 				{ text: result },
 				{
